@@ -67,6 +67,21 @@ impl Hangman {
     pub fn get_hint(&self) -> Option<&char> {
         self.letters_to_guess.iter().choose(&mut rand::thread_rng())
     }
+
+    pub fn get_guessed_word(&self) -> String {
+        let mut guessed_word = "".to_owned();
+
+        for c in self.word.chars() {
+            if self.letters_to_guess.contains(&c) {
+                guessed_word.push('_');
+                continue;
+            }
+
+            guessed_word.push(c);
+        }
+
+        guessed_word
+    }
 }
 
 #[cfg(test)]
@@ -189,5 +204,27 @@ mod test {
         let hint = hangman.get_hint();
 
         assert!(hint.is_none());
+    }
+
+    #[test]
+    fn test_guess_word_all_blank() {
+        let word = "hello".to_owned();
+        let hangman = Hangman::new(&word);
+
+        let guessed_word = hangman.get_guessed_word();
+
+        assert_eq!(guessed_word, "_____");
+    }
+
+    #[test]
+    fn test_guess_word_not_all_blank() {
+        let word = "hello".to_owned();
+        let mut hangman = Hangman::new(&word);
+
+        hangman.guess_letter('l');
+
+        let guessed_word = hangman.get_guessed_word();
+
+        assert_eq!(guessed_word, "__ll_");
     }
 }
