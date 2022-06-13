@@ -1,6 +1,8 @@
 use rand::prelude::IteratorRandom;
 use std::collections::HashSet;
 
+use crate::pics::HANGMAN_PICS;
+
 #[derive(Debug, PartialEq)]
 enum GameState {
     Playing,
@@ -18,7 +20,7 @@ pub struct Hangman {
     word: String,
 
     game_state: GameState,
-    lives: u8,
+    lives: usize,
 
     letters_to_guess: HashSet<char>,
 }
@@ -35,7 +37,7 @@ impl Hangman {
             word: word.clone(),
 
             game_state: GameState::Playing,
-            lives: 3,
+            lives: HANGMAN_PICS.len() - 1,
 
             letters_to_guess,
         }
