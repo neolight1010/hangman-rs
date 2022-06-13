@@ -84,10 +84,18 @@ impl Hangman {
 
         guessed_word
     }
+
+    pub fn get_pic(&self) -> &str {
+        let i = HANGMAN_PICS.len() - self.lives - 1;
+
+        HANGMAN_PICS.get(i).unwrap()
+    }
 }
 
 #[cfg(test)]
 mod test {
+    use crate::pics::HANGMAN_PICS;
+
     use super::{GameState, GuessResult, Hangman};
 
     #[test]
@@ -228,5 +236,21 @@ mod test {
         let guessed_word = hangman.get_guessed_word();
 
         assert_eq!(guessed_word, "__ll_");
+    }
+
+    #[test]
+    fn test_get_pic_all_lives() {
+        let hangman = Hangman::new(&"hello".to_owned());
+
+        assert_eq!(hangman.get_pic(), *HANGMAN_PICS.first().unwrap());
+    }
+
+    #[test]
+    fn test_get_pic_no_lives() {
+        let mut hangman = Hangman::new(&"hello".to_owned());
+
+        hangman.lives = 0;
+
+        assert_eq!(hangman.get_pic(), *HANGMAN_PICS.last().unwrap());
     }
 }
