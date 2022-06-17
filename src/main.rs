@@ -3,8 +3,8 @@ mod pics;
 
 use cursive::{
     event::{Event, EventResult, EventTrigger},
-    traits::{Nameable, Finder},
-    view::{ViewWrapper, Selector},
+    traits::{Finder, Nameable},
+    view::{Selector, ViewWrapper},
     views::{Canvas, Dialog, LinearLayout, OnEventView, Panel, TextView},
     wrap_impl, View,
 };
@@ -41,15 +41,19 @@ impl<T: View> ViewWrapper for HangmanView<T> {
     wrap_impl!(self.view: T);
 
     fn wrap_on_event(&mut self, event: Event) -> EventResult {
-
         match event {
             Event::Char(c) => {
                 self.hangman.guess_letter(c);
 
                 let pic = self.hangman.get_pic().to_owned();
+                let guessed_word = self.hangman.get_guessed_word().to_owned();
 
                 self.call_on(&Selector::Name("pic"), |v: &mut TextView| {
                     v.set_content(pic);
+                });
+
+                self.call_on(&Selector::Name("guessed_word"), |v: &mut TextView| {
+                    v.set_content(guessed_word);
                 });
             }
             _ => (),
