@@ -2,10 +2,10 @@ mod hangman;
 mod pics;
 
 use cursive::{
-    event::{Event, EventResult, EventTrigger},
+    event::{Event, EventResult},
     traits::{Finder, Nameable},
     view::{Selector, ViewWrapper},
-    views::{Canvas, Dialog, LinearLayout, OnEventView, Panel, TextView},
+    views::{Canvas, Dialog, LinearLayout, Panel, TextView},
     wrap_impl, View,
 };
 
