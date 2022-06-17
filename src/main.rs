@@ -2,11 +2,62 @@ mod hangman;
 mod pics;
 
 use cursive::{
-    event::{Event, EventTrigger},
+    event::{Event, EventResult, EventTrigger},
+    traits::{Nameable, Finder},
+    view::{ViewWrapper, Selector},
     views::{Canvas, Dialog, LinearLayout, OnEventView, Panel, TextView},
+    wrap_impl, View,
 };
 
 use crate::hangman::Hangman;
+
+struct HangmanView<T: View> {
+    hangman: Hangman,
+    view: T,
+}
+
+impl HangmanView<Panel<LinearLayout>> {
+    pub fn new() -> Self {
+        let hangman = Hangman::new(&"hello".to_owned());
+
+        let view = Panel::new(
+            LinearLayout::vertical()
+                .child(TextView::new(hangman.get_pic()).center().with_name("pic"))
+                .child(Canvas::new(()))
+                .child(
+                    TextView::new(hangman.get_guessed_word())
+                        .center()
+                        .with_name("guessed_word"),
+                )
+                .child(Canvas::new(()))
+                .child(TextView::new("Press a key to guess a letter").center()),
+        );
+
+        Self { hangman, view }
+    }
+}
+
+impl<T: View> ViewWrapper for HangmanView<T> {
+    wrap_impl!(self.view: T);
+
+    fn wrap_on_event(&mut self, event: Event) -> EventResult {
+
+        match event {
+            Event::Char(c) => {
+                self.hangman.guess_letter(c);
+
+                let pic = self.hangman.get_pic().to_owned();
+
+                self.call_on(&Selector::Name("pic"), |v: &mut TextView| {
+                    v.set_content(pic);
+                });
+            }
+            _ => (),
+        }
+
+        EventResult::Consumed(None)
+    }
+}
 
 fn main() {
     let mut siv = cursive::default();
@@ -20,29 +71,7 @@ fn main_menu() -> impl cursive::View {
     Dialog::around(TextView::new("Hangman Rust").center())
         .button("Start", |s| {
             s.pop_layer();
-            s.add_layer(game_screen());
+            s.add_layer(HangmanView::new());
         })
         .button("Quit", |s| s.quit())
-}
-
-fn game_screen() -> impl cursive::View {
-    let hangman = Hangman::new(&"hello".to_owned());
-
-    let panel = Panel::new(
-        LinearLayout::vertical()
-            .child(TextView::new(hangman.get_pic()).center())
-            .child(Canvas::new(()))
-            .child(TextView::new(hangman.get_guessed_word()).center())
-            .child(Canvas::new(()))
-            .child(TextView::new("Press a key to guess a letter").center()),
-    );
-
-    OnEventView::new(panel).on_pre_event_inner(EventTrigger::any(), |_, event| {
-        match event {
-            Event::Char(c) => println!("{c}"),
-            _ => (),
-        }
-
-        None
-    })
 }
