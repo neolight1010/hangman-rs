@@ -1,4 +1,3 @@
-use rand::prelude::IteratorRandom;
 use std::collections::HashSet;
 
 use crate::pics::HANGMAN_PICS;
@@ -55,7 +54,9 @@ impl Hangman {
                 GuessResult::Correct
             }
             false => {
-                self.lives -= 1;
+                if self.lives > 0 {
+                    self.lives -= 1;
+                }
 
                 if self.lives == 0 {
                     self.game_state = GameState::Lose;
@@ -64,10 +65,6 @@ impl Hangman {
                 GuessResult::Incorrect
             }
         }
-    }
-
-    pub fn get_hint(&self) -> Option<&char> {
-        self.letters_to_guess.iter().choose(&mut rand::thread_rng())
     }
 
     pub fn get_guessed_word(&self) -> String {
@@ -178,6 +175,15 @@ mod test {
     }
 
     #[test]
+    fn test_incorrect_guess_not_panic_when_no_lives() {
+        let mut hangman = Hangman::new(&"test".to_string());
+
+        hangman.lives = 0;
+
+        hangman.guess_letter('z');
+    }
+
+    #[test]
     fn test_lose_state_after_last_incorrect_guess() {
         let mut hangman = Hangman::new(&"test".to_string());
 
@@ -188,32 +194,6 @@ mod test {
         }
 
         assert_eq!(hangman.game_state, GameState::Lose);
-    }
-
-    #[test]
-    fn test_hint_returns_letter_from_word() {
-        let word = "test".to_string();
-
-        let hangman = Hangman::new(&word);
-
-        for _ in 0..50 {
-            let hint = hangman.get_hint();
-
-            assert!(hint.is_some());
-
-            assert!(word.contains(*hint.unwrap()));
-        }
-    }
-
-    #[test]
-    fn test_hint_returns_none_when_no_letter_to_guess() {
-        let mut hangman = Hangman::new(&"t".to_string());
-
-        hangman.guess_letter('t');
-
-        let hint = hangman.get_hint();
-
-        assert!(hint.is_none());
     }
 
     #[test]
