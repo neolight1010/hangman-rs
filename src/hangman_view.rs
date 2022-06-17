@@ -14,7 +14,7 @@ pub struct HangmanView<T: View> {
 
 impl HangmanView<Panel<LinearLayout>> {
     pub fn new() -> Self {
-        let hangman = Hangman::new(&"hello".to_owned());
+        let hangman = Hangman::new("hello");
 
         let view = Panel::new(
             LinearLayout::vertical()

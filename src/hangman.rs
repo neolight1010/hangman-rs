@@ -25,7 +25,7 @@ pub struct Hangman {
 }
 
 impl Hangman {
-    pub fn new(word: &String) -> Self {
+    pub fn new(word: &str) -> Self {
         let mut letters_to_guess = HashSet::new();
 
         for c in word.chars() {
@@ -33,7 +33,7 @@ impl Hangman {
         }
 
         Self {
-            word: word.clone(),
+            word: word.to_owned(),
 
             game_state: GameState::Playing,
             lives: HANGMAN_PICS.len() - 1,
