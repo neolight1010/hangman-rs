@@ -9,6 +9,8 @@ use crate::hangman_view::HangmanView;
 fn main() {
     let mut siv = cursive::default();
 
+    siv.load_toml(include_str!("theme.toml")).unwrap();
+
     siv.add_layer(main_menu());
 
     siv.run();
