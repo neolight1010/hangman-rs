@@ -1,12 +1,12 @@
 use cursive::{
     event::{Event, EventResult},
     traits::{Finder, Nameable},
-    view::{Selector, ViewWrapper, IntoBoxedView},
-    views::{Canvas, LinearLayout, Panel, TextView, BoxedView},
+    view::{IntoBoxedView, Selector, ViewWrapper},
+    views::{BoxedView, Canvas, LinearLayout, Panel, TextView},
     wrap_impl, View,
 };
 
-use crate::hangman::Hangman;
+use crate::hangman::{GameState, Hangman};
 pub struct HangmanView<T: View> {
     hangman: Hangman,
     view: T,
@@ -15,10 +15,16 @@ pub struct HangmanView<T: View> {
 impl HangmanView<BoxedView> {
     pub fn new() -> Self {
         let hangman = Hangman::new("hello");
-        let view = Self::playing_view(&hangman);
 
+        let view = match hangman.get_game_state() {
+            GameState::Playing => Self::playing_view(&hangman),
+            _ => Self::game_over_view(&hangman),
+        };
 
-        Self { hangman, view: BoxedView::new(view) }
+        Self {
+            hangman,
+            view: BoxedView::new(view),
+        }
     }
 
     fn playing_view(hangman: &Hangman) -> Box<dyn View> {
@@ -33,12 +39,31 @@ impl HangmanView<BoxedView> {
                 )
                 .child(Canvas::new(()))
                 .child(TextView::new("Press a key to guess a letter").center()),
-        ).into_boxed_view()
+        )
+        .into_boxed_view()
+    }
+
+    fn game_over_view(hangman: &Hangman) -> Box<dyn View> {
+        Panel::new(
+            LinearLayout::vertical()
+                .child(TextView::new(hangman.get_pic()).center())
+                .child(TextView::new("Game Over :c").center()),
+        )
+        .into_boxed_view()
+    }
+
+    fn game_win_view(hangman: &Hangman) -> Box<dyn View> {
+        Panel::new(
+            LinearLayout::vertical()
+                .child(TextView::new(hangman.get_pic()).center())
+                .child(TextView::new("You Won! :D").center()),
+        )
+        .into_boxed_view()
     }
 }
 
-impl<T: View> ViewWrapper for HangmanView<T> {
-    wrap_impl!(self.view: T);
+impl ViewWrapper for HangmanView<BoxedView> {
+    wrap_impl!(self.view: BoxedView);
 
     fn wrap_on_event(&mut self, event: Event) -> EventResult {
         match event {
@@ -55,6 +80,16 @@ impl<T: View> ViewWrapper for HangmanView<T> {
                 self.call_on(&Selector::Name("guessed_word"), |v: &mut TextView| {
                     v.set_content(guessed_word);
                 });
+
+                match self.hangman.get_game_state() {
+                    GameState::Lose => {
+                        self.view = BoxedView::new(HangmanView::game_over_view(&self.hangman));
+                    }
+                    GameState::Win => {
+                        self.view = BoxedView::new(HangmanView::game_win_view(&self.hangman));
+                    }
+                    _ => (),
+                };
             }
             _ => (),
         }
@@ -62,4 +97,3 @@ impl<T: View> ViewWrapper for HangmanView<T> {
         EventResult::Consumed(None)
     }
 }
-
