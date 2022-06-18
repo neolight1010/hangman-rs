@@ -68,6 +68,10 @@ impl ViewWrapper for HangmanView<BoxedView> {
     wrap_impl!(self.view: BoxedView);
 
     fn wrap_on_event(&mut self, event: Event) -> EventResult {
+        if self.hangman.get_game_state() != GameState::Playing {
+            return EventResult::Ignored;
+        }
+
         match event {
             Event::Char(c) => {
                 self.hangman.guess_letter(c);
