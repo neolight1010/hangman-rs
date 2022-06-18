@@ -15,8 +15,14 @@ pub struct HangmanView<T: View> {
 impl HangmanView<BoxedView> {
     pub fn new() -> Self {
         let hangman = Hangman::new("hello");
+        let view = Self::playing_view(&hangman);
 
-        let view = Panel::new(
+
+        Self { hangman, view: BoxedView::new(view) }
+    }
+
+    fn playing_view(hangman: &Hangman) -> Box<dyn View> {
+        Panel::new(
             LinearLayout::vertical()
                 .child(TextView::new(hangman.get_pic()).center().with_name("pic"))
                 .child(Canvas::new(()))
@@ -27,9 +33,7 @@ impl HangmanView<BoxedView> {
                 )
                 .child(Canvas::new(()))
                 .child(TextView::new("Press a key to guess a letter").center()),
-        );
-
-        Self { hangman, view: BoxedView::new(view.into_boxed_view()) }
+        ).into_boxed_view()
     }
 }
 
