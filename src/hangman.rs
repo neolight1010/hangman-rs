@@ -17,9 +17,7 @@ pub enum GuessResult {
 #[derive(Debug)]
 pub struct Hangman {
     word: String,
-
     lives: usize,
-
     letters_to_guess: HashSet<char>,
 }
 
