@@ -1,8 +1,8 @@
 use cursive::{
     event::{Event, EventResult},
     traits::{Finder, Nameable},
-    view::{Selector, ViewWrapper},
-    views::{Canvas, LinearLayout, Panel, TextView},
+    view::{Selector, ViewWrapper, IntoBoxedView},
+    views::{Canvas, LinearLayout, Panel, TextView, BoxedView},
     wrap_impl, View,
 };
 
@@ -12,7 +12,7 @@ pub struct HangmanView<T: View> {
     view: T,
 }
 
-impl HangmanView<Panel<LinearLayout>> {
+impl HangmanView<BoxedView> {
     pub fn new() -> Self {
         let hangman = Hangman::new("hello");
 
@@ -29,7 +29,7 @@ impl HangmanView<Panel<LinearLayout>> {
                 .child(TextView::new("Press a key to guess a letter").center()),
         );
 
-        Self { hangman, view }
+        Self { hangman, view: BoxedView::new(view.into_boxed_view()) }
     }
 }
 
