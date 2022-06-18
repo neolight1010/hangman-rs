@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::pics::HANGMAN_PICS;
 
 #[derive(Debug, PartialEq)]
-enum GameState {
+pub enum GameState {
     Playing,
     Win,
     Lose,
@@ -18,7 +18,6 @@ pub enum GuessResult {
 pub struct Hangman {
     word: String,
 
-    game_state: GameState,
     lives: usize,
 
     letters_to_guess: HashSet<char>,
@@ -35,7 +34,6 @@ impl Hangman {
         Self {
             word: word.to_owned(),
 
-            game_state: GameState::Playing,
             lives: HANGMAN_PICS.len() - 1,
 
             letters_to_guess,
@@ -47,19 +45,11 @@ impl Hangman {
             true => {
                 self.letters_to_guess.remove(&letter);
 
-                if self.letters_to_guess.is_empty() {
-                    self.game_state = GameState::Win;
-                }
-
                 GuessResult::Correct
             }
             false => {
                 if self.lives > 0 {
                     self.lives -= 1;
-                }
-
-                if self.lives == 0 {
-                    self.game_state = GameState::Lose;
                 }
 
                 GuessResult::Incorrect
@@ -86,6 +76,18 @@ impl Hangman {
         let i = HANGMAN_PICS.len() - self.lives - 1;
 
         HANGMAN_PICS.get(i).unwrap()
+    }
+
+    pub fn get_game_state(&self) -> GameState {
+        if self.letters_to_guess.len() == 0 {
+            return GameState::Win;
+        }
+
+        if self.lives > 0 {
+            return GameState::Playing;
+        }
+
+        GameState::Lose
     }
 }
 
@@ -158,7 +160,7 @@ mod test {
         hangman.guess_letter('t');
         hangman.guess_letter('e');
 
-        assert_eq!(hangman.game_state, GameState::Win);
+        assert_eq!(hangman.get_game_state(), GameState::Win);
     }
 
     #[test]
@@ -193,7 +195,7 @@ mod test {
             hangman.guess_letter('z');
         }
 
-        assert_eq!(hangman.game_state, GameState::Lose);
+        assert_eq!(hangman.get_game_state(), GameState::Lose);
     }
 
     #[test]
