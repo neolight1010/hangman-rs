@@ -2,7 +2,7 @@ use cursive::{
     event::{Event, EventResult},
     traits::{Finder, Nameable},
     view::{IntoBoxedView, Selector, ViewWrapper},
-    views::{BoxedView, Canvas, LinearLayout, Panel, TextView, DummyView},
+    views::{BoxedView, DummyView, LinearLayout, Panel, TextView},
     wrap_impl, View,
 };
 
