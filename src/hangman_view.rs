@@ -2,7 +2,7 @@ use cursive::{
     event::{Event, EventResult},
     traits::{Finder, Nameable},
     view::{IntoBoxedView, Selector, ViewWrapper},
-    views::{BoxedView, Canvas, LinearLayout, Panel, TextView},
+    views::{BoxedView, Canvas, LinearLayout, Panel, TextView, DummyView},
     wrap_impl, View,
 };
 
@@ -31,13 +31,13 @@ impl HangmanView<BoxedView> {
         Panel::new(
             LinearLayout::vertical()
                 .child(TextView::new(hangman.get_pic()).center().with_name("pic"))
-                .child(Canvas::new(()))
+                .child(DummyView)
                 .child(
                     TextView::new(hangman.get_guessed_word())
                         .center()
                         .with_name("guessed_word"),
                 )
-                .child(Canvas::new(()))
+                .child(DummyView)
                 .child(TextView::new("Press a key to guess a letter").center()),
         )
         .into_boxed_view()
@@ -47,6 +47,7 @@ impl HangmanView<BoxedView> {
         Panel::new(
             LinearLayout::vertical()
                 .child(TextView::new(hangman.get_pic()).center())
+                .child(DummyView)
                 .child(TextView::new("Game Over :c").center()),
         )
         .into_boxed_view()
@@ -56,6 +57,7 @@ impl HangmanView<BoxedView> {
         Panel::new(
             LinearLayout::vertical()
                 .child(TextView::new(hangman.get_pic()).center())
+                .child(DummyView)
                 .child(TextView::new("You Won! :D").center()),
         )
         .into_boxed_view()
